@@ -23,10 +23,15 @@ class Bullet:
     def __init__(self, image_src: str, rectangle: Rectangle):
         self.image = tk.PhotoImage(file=image_src)
         self.rectangle = rectangle
+        self.is_alive = True
 
-    def update(self):
-        self.rectangle.y1 -= 5
-        self.rectangle.y2 -= 5
+    def update(self, kill_list: list):
+        if self.is_alive:
+            self.rectangle.y1 -= 3
+            self.rectangle.y2 -= 3
+            if self.rectangle.y2 <= 0:
+                kill_list.append(self)
+                self.is_alive = False
 
     def draw(self, canvas):
         canvas.create_image(self.rectangle.x1, self.rectangle.y1, anchor="nw", image=self.image)
