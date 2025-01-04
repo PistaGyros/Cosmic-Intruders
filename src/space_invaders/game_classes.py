@@ -1,5 +1,13 @@
 import tkinter as tk
 from structs import *
+import platform
+
+
+if platform.system() == "Windows":
+    try:
+        import winsound
+    except:
+        print("Winsound module not available.")
 
 
 class Player:
@@ -24,14 +32,32 @@ class Bullet:
         self.image = tk.PhotoImage(file=image_src)
         self.rectangle = rectangle
         self.is_alive = True
+        #winsound.PlaySound("../../media/Space Invaders_laser.wav", winsound.SND_ASYNC)
 
-    def update(self, kill_list: list):
+    def kill_itself(self, kill_list: list):
+        kill_list.append(self)
+        self.is_alive = False
+
+    def on_collision(self, kill_list: list, meteorites: list):
+        for meteorite in meteorites:
+            if meteorite.rectangle.x1 < self.rectangle.x1 < meteorite.rectangle.x2 \
+                    or meteorite.rectangle.x1 < self.rectangle.x2 < meteorite.rectangle.x2:
+                if meteorite.rectangle.y1 < self.rectangle.y1 < meteorite.rectangle.y2\
+                        or meteorite.rectangle.y1 < self.rectangle.y2 < meteorite.rectangle.y2:
+                    print("Collision")
+                    #winsound.PlaySound("../../media/Space Invaders_explosion.wav", winsound.SND_ASYNC)
+                    meteorites.remove(meteorite)
+                    self.kill_itself(kill_list)
+
+    def update(self, kill_list: list, meteorites: list):
         if self.is_alive:
-            self.rectangle.y1 -= 3
-            self.rectangle.y2 -= 3
+            self.rectangle.y1 -= 5
+            self.rectangle.y2 -= 5
+
+            self.on_collision(kill_list, meteorites)
+
             if self.rectangle.y2 <= 0:
-                kill_list.append(self)
-                self.is_alive = False
+                self.kill_itself(kill_list)
 
     def draw(self, canvas):
         canvas.create_image(self.rectangle.x1, self.rectangle.y1, anchor="nw", image=self.image)
@@ -41,6 +67,18 @@ class Meteorite:
     def __init__(self, image_src: str, rectangle: Rectangle):
         self.image = tk.PhotoImage(file=image_src)
         self.rectangle = rectangle
+        self.direction = 1
+        self.is_alive = True
+
+    def update(self, meteorites: list):
+        if self.is_alive:
+            self.rectangle.x1 += 0.5 * self.direction
+            self.rectangle.x2 += 0.5 * self.direction
+            if self.rectangle.x2 >= 600 or self.rectangle.x1 <= 0:
+                for meteorite in meteorites:
+                    meteorite.direction *= -1
+                    meteorite.rectangle.y1 += 10
+                    meteorite.rectangle.y2 += 10
 
     def draw(self, canvas):
         canvas.create_image(self.rectangle.x1, self.rectangle.y1, anchor="nw", image=self.image)
