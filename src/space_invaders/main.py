@@ -26,8 +26,8 @@ def shoot_bullet(event):
         bullets.append(bullet)
 
 
-def spawn_enemies():
-    for i in range(30):
+def spawn_enemies(num_of_enemies: int):
+    for i in range(num_of_enemies):
         if i <= 9:
             k = 0
             yshift = 0
@@ -56,16 +56,11 @@ def create_window():
     return root, canvas
 
 
-def play_music():
-    winsound.PlaySound("../../media/Cinematic-electronic-track.wav", winsound.SND_ASYNC)
-
-
 root, canvas = create_window()
 bg = tk.PhotoImage(file="../../media/space_invaders_background.gif")
 
 player = Player(image_src="../../media/player_v2.gif", rectangle=Rectangle(285, 500, 315, 530))
-spawn_enemies()
-#play_music()
+spawn_enemies(30)
 
 # Binds
 canvas.bind_all("a", move_player)
@@ -74,6 +69,7 @@ canvas.bind_all("d", move_player)
 canvas.bind_all("<Right>", move_player)
 canvas.bind_all("<Escape>", stop_game)
 canvas.bind_all("<space>", shoot_bullet)
+canvas.bind_all("<Button-1>", shoot_bullet)
 
 
 def Update():

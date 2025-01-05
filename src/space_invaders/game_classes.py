@@ -1,13 +1,5 @@
 import tkinter as tk
-from structs import *
-import platform
-
-
-if platform.system() == "Windows":
-    try:
-        import winsound
-    except:
-        print("Winsound module not available.")
+from structs import Rectangle
 
 
 class Player:
@@ -32,7 +24,6 @@ class Bullet:
         self.image = tk.PhotoImage(file=image_src)
         self.rectangle = rectangle
         self.is_alive = True
-        #winsound.PlaySound("../../media/Space Invaders_laser.wav", winsound.SND_ASYNC)
 
     def kill_itself(self, kill_list: list):
         kill_list.append(self)
@@ -45,7 +36,6 @@ class Bullet:
                 if meteorite.rectangle.y1 < self.rectangle.y1 < meteorite.rectangle.y2\
                         or meteorite.rectangle.y1 < self.rectangle.y2 < meteorite.rectangle.y2:
                     print("Collision")
-                    #winsound.PlaySound("../../media/Space Invaders_explosion.wav", winsound.SND_ASYNC)
                     meteorites.remove(meteorite)
                     self.kill_itself(kill_list)
 
@@ -74,7 +64,7 @@ class Meteorite:
         if self.is_alive:
             self.rectangle.x1 += 0.5 * self.direction
             self.rectangle.x2 += 0.5 * self.direction
-            if self.rectangle.x2 >= 600 or self.rectangle.x1 <= 0:
+            if self.rectangle.x2 >= 595 or self.rectangle.x1 <= 5:
                 for meteorite in meteorites:
                     meteorite.direction *= -1
                     meteorite.rectangle.y1 += 10
