@@ -1,18 +1,14 @@
 from scenes import *
 
 
-game_loop_scene = MainGameLoop(30)
+def create_window():
+    root = tk.Tk()
+    canvas = tk.Canvas(root, height=600, width=600, bg="black")
+    canvas.pack()
+
+    return root, canvas
 
 
-def main_game_loop(scene):
-    while scene.run:
-        scene.Update()
-        scene.Draw()
-        scene.shoot_timer -= 1
-        scene.canvas.update()
-        scene.canvas.after(25)
-
-    scene.root.mainloop()
-
-
-main_game_loop(game_loop_scene)
+root, canvas = create_window()
+main_scene = MainMenuScene(root, canvas)
+root.mainloop()
