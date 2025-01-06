@@ -39,15 +39,14 @@ class Bullet:
                     meteorites.remove(meteorite)
                     self.kill_itself(kill_list)
 
+        if self.rectangle.y2 <= 0:
+            self.kill_itself(kill_list)
+
     def update(self, kill_list: list, meteorites: list):
         if self.is_alive:
             self.rectangle.y1 -= 5
             self.rectangle.y2 -= 5
-
             self.on_collision(kill_list, meteorites)
-
-            if self.rectangle.y2 <= 0:
-                self.kill_itself(kill_list)
 
     def draw(self, canvas):
         canvas.create_image(self.rectangle.x1, self.rectangle.y1, anchor="nw", image=self.image)
