@@ -8,11 +8,11 @@ class Player:
         self.rectangle = rectangle
 
     def move_player(self, delta_time: float, direction):
-        self.rectangle.x1 += (300 * direction) * delta_time
-        self.rectangle.x2 += (300 * direction) * delta_time
+        self.rectangle.x1 += (200 * direction) * delta_time
+        self.rectangle.x2 += (200 * direction) * delta_time
         if self.rectangle.x1 > 570 or self.rectangle.x1 < 0:
-            self.rectangle.x1 -= (300 * direction) * delta_time
-            self.rectangle.x2 -= (300 * direction) * delta_time
+            self.rectangle.x1 -= (200 * direction) * delta_time
+            self.rectangle.x2 -= (200 * direction) * delta_time
 
     def draw(self, canvas):
         canvas.create_image(self.rectangle.x1, self.rectangle.y1, anchor="nw", image=self.image)

@@ -1,5 +1,6 @@
 from game_classes import *
 import time
+import tkinter.scrolledtext
 
 
 class MainGameScene:
@@ -94,7 +95,6 @@ class MainGameScene:
         self.canvas.create_text(60, 20, text=f"Points: {self.points}", font="Arial 14", fill="white")
         self.actual_time = int(time.time() - self.stopwatch)
         self.canvas.create_text(540, 20, text=f"Time: {self.actual_time}", font="Arial 14", fill="white")
-        # TODO: add shoot bar
         self.canvas.create_rectangle(500, 540, 500 + (80 * (self.shoot_timer / 50)), 560, fill="yellow")
 
     def on_enter(self, event):
@@ -102,7 +102,7 @@ class MainGameScene:
         file = open("../../media/leaderboard.txt", "a")
         file.write(f"\n{input_name}, {self.actual_difficulty}, {self.points}, {self.actual_time}")
         file.close()
-        leaderboard_scene = LeaderBoard(self.root, self.canvas, "../../media/leaderboard.txt")
+        leaderboard_scene = LeaderBoard(self.root, self.canvas, self, "../../media/leaderboard.txt")
         leaderboard_scene.Draw(self.main_menu_scene)
 
     def end_game_frame(self, win_or_lose):
@@ -151,7 +151,6 @@ class MainGameScene:
                     meteorites_change_direct = True
             if meteorites_change_direct:
                 self.change_direction_of_meteorites()
-
         elif len(self.meteorites) <= 0:
             # You won, the end
             self.run = False
@@ -188,29 +187,27 @@ class MainMenuScene:
         self.canvas.delete("all")
         self.diff_buttons.clear()
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg)
+        self.canvas.create_text(300, 150, text="Cosmic\nIntruders", font="Times 50", fill="yellow", justify="center")
         start_button = tk.Button(self.root, text="Start Game", bg="white", command=self.main_game_loop_button)
         self.canvas.create_window(300, 290, window=start_button)
         # level buttons
         self.create_difficulties_buttons()
         leaderboard_button = tk.Button(self.root, text="LeaderBoard", bg="white", command=self.leaderbutton)
         self.canvas.create_window(300, 350, window=leaderboard_button)
+        self.canvas.create_text(
+            300, 500, text="A/D Left/Right | <space> Shoot", font="Arial 30", fill="black", justify="center")
 
     def create_difficulties_buttons(self):
-        self.diff_buttons.append(tk.Button(self.root, text="1", bg="green",
-                                           command=lambda: self.change_difficulty(1, 0)))
-        self.diff_buttons.append(tk.Button(self.root, text="2",
-                                           command=lambda: self.change_difficulty(2, 1)))
-        self.diff_buttons.append(tk.Button(self.root, text="3",
-                                           command=lambda: self.change_difficulty(3, 2)))
-        self.diff_buttons.append(tk.Button(self.root, text="4",
-                                           command=lambda: self.change_difficulty(4, 3)))
-        self.diff_buttons.append(tk.Button(self.root, text="5",
-                                           command=lambda: self.change_difficulty(5, 4)))
+        self.diff_buttons.append(tk.Button(self.root, text="1", bg="green", command=lambda: self.change_difficulty(0)))
+        self.diff_buttons.append(tk.Button(self.root, text="2", command=lambda: self.change_difficulty(1)))
+        self.diff_buttons.append(tk.Button(self.root, text="3", command=lambda: self.change_difficulty(2)))
+        self.diff_buttons.append(tk.Button(self.root, text="4", command=lambda: self.change_difficulty(3)))
+        self.diff_buttons.append(tk.Button(self.root, text="5", command=lambda: self.change_difficulty(4)))
         for i in range(len(self.diff_buttons)):
             self.canvas.create_window(260 + i * 20, 320, window=self.diff_buttons[i])
 
-    def change_difficulty(self, new_diff, pressed_button_index):
-        self.actual_diff = new_diff
+    def change_difficulty(self, pressed_button_index):
+        self.actual_diff = pressed_button_index + 1
         for button in self.diff_buttons:
             button.config(bg="white")
         self.diff_buttons[pressed_button_index].config(bg="green")
@@ -227,12 +224,12 @@ class MainMenuScene:
             scene.canvas.after(1)
 
     def leaderbutton(self):
-        leaderboard_scene = LeaderBoard(self.root, self.canvas, "../../media/leaderboard.txt")
+        leaderboard_scene = LeaderBoard(self.root, self.canvas, self, "../../media/leaderboard.txt")
         leaderboard_scene.Draw(self)
 
 
 class LeaderBoard:
-    def __init__(self, root, canvas, leaderboard_file_path):
+    def __init__(self, root, canvas, main_scene, leaderboard_file_path):
         self.root = root
         self.canvas = canvas
         self.file_path = leaderboard_file_path
@@ -240,6 +237,8 @@ class LeaderBoard:
         self.difficulties = []
         self.points = []
         self.times = []
+        self.bg = tk.PhotoImage(file="../../media/space_invaders_background.gif")
+        self.canvas.create_image(0, 0, anchor="nw", image=self.bg)
 
     def read_file(self, file_path):
         file = open(file_path, "r")
@@ -254,12 +253,15 @@ class LeaderBoard:
 
     def Draw(self, main_scene):
         self.canvas.delete("all")
-
-        self.canvas.create_text(300, 50, text="LeaderBoard", font="Arial 18", fill="white")
+        self.canvas.create_text(340, 50, text="LeaderBoard", font="Arial 18", fill="white")
         self.read_file(self.file_path)
+        scrollable_leaderboard = tk.scrolledtext.ScrolledText(self.root, width=40, bg="cornflower blue", font="Arial 14")
         for i in range(len(self.names)):
-            self.canvas.create_text(300, 50 * i + 100, text=f"{i + 1}. Meno: {self.names[i]} uroven: "
-                                                            f"{self.difficulties[i]} points: {self.points[i]} "
-                                                            f"čas: {self.times[i]}", fill="white", font="Arial 14")
+            scrollable_leaderboard.insert(tk.INSERT, f"{i + 1}. Meno: {self.names[i]}, úroveň: "
+                                                     f"{self.difficulties[i]}, body: {self.points[i]}, "
+                                                     f"čas: {self.times[i]}\n", "text")
+        scrollable_leaderboard.tag_configure("text", justify="center")
+        scrollable_leaderboard.configure(state="disabled")
+        self.canvas.create_window(340, 330, window=scrollable_leaderboard)
         leave_button = tk.Button(self.root, text="Main Menu", command=main_scene.Draw)
         self.canvas.create_window(50, 50, window=leave_button)
