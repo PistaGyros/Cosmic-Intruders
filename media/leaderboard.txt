@@ -38,3 +38,7 @@ Sample, 0, 0, 0
 Sample, 0, 0, 0
 Sample, 0, 0, 0
 Sample, 0, 0, 0
+Tamko, 5, 140, 55
+Write your npecerickname, 1, 85, 23
+Write your nickname, 1, 100, 5
+Write your nickname, 1, 90, 3
